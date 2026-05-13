@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SkillDrop · .skill → .zip",
+  title: "SkillDrop",
   description:
     "Conversor client-side de arquivos .skill para .zip. Nada sai do seu dispositivo.",
 };

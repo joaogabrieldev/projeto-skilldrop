@@ -1,3 +1,4 @@
+import JSZip from "jszip";
 import type { RejectionReason } from "./types";
 
 export const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500 MB
@@ -44,13 +45,84 @@ export function buildDownloadName(
 }
 
 /**
- * Reads the file fully into memory and returns a fresh Blob with the same
- * bytes, typed as a zip. No content transformation happens — `.skill` is
- * already a zip, this only changes how the OS labels it.
+ * Detects a single redundant root folder that wraps every entry.
+ *
+ * Returns the prefix (e.g. `"foo/"`) when every entry inside the zip lives
+ * under the same single top-level directory. Returns `null` otherwise.
+ *
+ * Works even when the source zip has no explicit directory entries, because
+ * it inspects each entry's first path segment rather than relying on
+ * `endsWith('/')` markers.
+ */
+export function detectRedundantRoot(entries: string[]): string | null {
+  if (entries.length === 0) return null;
+
+  let prefix: string | null = null;
+  for (const entry of entries) {
+    // Strip a trailing slash so an explicit folder entry like "foo/" still
+    // contributes "foo" as its first segment.
+    const slash = entry.indexOf("/");
+    if (slash === -1) {
+      // file at the root → no single-root structure to strip
+      return null;
+    }
+    const firstDir = entry.slice(0, slash + 1);
+    if (prefix === null) {
+      prefix = firstDir;
+    } else if (prefix !== firstDir) {
+      // entries diverge → multiple top-level items
+      return null;
+    }
+  }
+  return prefix;
+}
+
+/**
+ * Reads a `.skill` file, parses it as a zip, and returns a new `.zip` Blob.
+ *
+ * If the zip wraps everything inside a single root folder (a common
+ * structural quirk in `.skill` files), that folder is stripped so the
+ * resulting zip extracts cleanly without the extra nesting.
+ *
+ * 100% client-side: no network, no upload.
  */
 export async function convertFile(file: File): Promise<Blob> {
   const buffer = await file.arrayBuffer();
-  return new Blob([buffer], { type: "application/zip" });
+  const source = await JSZip.loadAsync(buffer);
+
+  const entries = Object.keys(source.files);
+  const prefix = detectRedundantRoot(entries);
+
+  const out = new JSZip();
+
+  for (const path of entries) {
+    // Skip the root folder entry itself when stripping a prefix
+    if (prefix && path === prefix) continue;
+
+    const newPath = prefix ? path.slice(prefix.length) : path;
+    if (!newPath) continue;
+
+    const entry = source.files[path];
+    if (entry.dir) {
+      // Preserve empty folders by registering them explicitly.
+      out.folder(newPath.replace(/\/$/, ""));
+    } else {
+      const content = await entry.async("uint8array");
+      out.file(newPath, content, {
+        date: entry.date,
+        comment: entry.comment,
+        unixPermissions: entry.unixPermissions,
+        dosPermissions: entry.dosPermissions,
+      });
+    }
+  }
+
+  return out.generateAsync({
+    type: "blob",
+    mimeType: "application/zip",
+    compression: "DEFLATE",
+    compressionOptions: { level: 6 },
+  });
 }
 
 /**
