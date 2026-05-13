@@ -1,0 +1,182 @@
+@import "tailwindcss";
+
+@theme {
+  /* ─────────────── PALETTE ─────────────── */
+  --color-bg: #0a0a0a;
+  --color-surface: #121212;
+  --color-surface-hot: #1a1a1a;
+  --color-border: #1f1f1f;
+  --color-border-strong: #2e2e2e;
+
+  --color-fg: #f4f4f4;
+  --color-muted: #8a8a8a;
+  --color-muted-2: #555555;
+
+  --color-amber: #ffb000;
+  --color-amber-hover: #ffc94d;
+  --color-amber-faint: rgba(255, 176, 0, 0.08);
+
+  --color-green: #00d96f;
+  --color-green-faint: rgba(0, 217, 111, 0.08);
+
+  --color-red: #ff453a;
+  --color-red-faint: rgba(255, 69, 58, 0.08);
+
+  /* ─────────────── TYPOGRAPHY ─────────────── */
+  --font-display: "Archivo Black", "Arial Black", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", "Courier New",
+    monospace;
+  --font-sans: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* CSS variables exposed as `var(--name)` for inline styles */
+:root {
+  --bg: #0a0a0a;
+  --surface: #121212;
+  --surface-hot: #1a1a1a;
+  --border: #1f1f1f;
+  --border-strong: #2e2e2e;
+
+  --fg: #f4f4f4;
+  --muted: #8a8a8a;
+  --muted-2: #555555;
+
+  --amber: #ffb000;
+  --amber-hover: #ffc94d;
+  --amber-faint: rgba(255, 176, 0, 0.08);
+
+  --green: #00d96f;
+  --green-faint: rgba(0, 217, 111, 0.08);
+
+  --red: #ff453a;
+  --red-faint: rgba(255, 69, 58, 0.08);
+}
+
+/* ─────────────── BASE ─────────────── */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-mono);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  /* subtle grain overlay — industrial control panel feel */
+  background-image:
+    radial-gradient(
+      circle at 20% 0%,
+      rgba(255, 176, 0, 0.02) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 80% 100%,
+      rgba(0, 217, 111, 0.02) 0%,
+      transparent 40%
+    );
+  background-attachment: fixed;
+  min-height: 100dvh;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  /* very subtle scanline texture */
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.012) 0,
+    rgba(255, 255, 255, 0.012) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* keep app content above the overlay */
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* selection */
+::selection {
+  background: var(--amber);
+  color: var(--bg);
+}
+
+/* focus ring */
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+/* utility shorthands for fonts (used by Tailwind via theme tokens too) */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 900;
+}
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* scrollbar — industrial */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--amber);
+}
+
+/* page-load reveal animation */
+@keyframes sd-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+main > * {
+  animation: sd-rise 480ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+main > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+main > *:nth-child(2) {
+  animation-delay: 70ms;
+}
+main > *:nth-child(3) {
+  animation-delay: 140ms;
+}
+main > *:nth-child(4) {
+  animation-delay: 210ms;
+}
+main > *:nth-child(5) {
+  animation-delay: 280ms;
+}
+main > *:nth-child(6) {
+  animation-delay: 350ms;
+}
+main > *:nth-child(7) {
+  animation-delay: 420ms;
+}
