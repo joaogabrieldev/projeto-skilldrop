@@ -32,9 +32,9 @@ Ferramenta web **100% client-side** que converte arquivos `.skill` em `.zip` no 
 
 ## 🌐 Deploy
 
-Publicação sugerida na **Vercel** (importação direta a partir do GitHub). **URL pública de demonstração:** não informada neste repositório — após o deploy, você pode atualizar este README com o domínio final.
+Publicação na **Vercel**
 
-### 🔗 [Importar o projeto na Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjoaogabrieldev%2Fprojeto-skilldrop)
+### 🔗 [Demonstração ao vivo](https://projeto-skilldrop.vercel.app/)
 
 ---
 
